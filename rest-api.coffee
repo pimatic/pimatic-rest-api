@@ -1,9 +1,11 @@
-__ = require('i18n').__
-Q = require 'q'
-fs = require 'fs'
-semver = require 'semver'
-
 module.exports = (env) ->
+  fs = require 'fs'
+
+  convict = env.require "convict"
+  Q = env.require 'q'
+  assert = env.require 'cassert'
+  __ = env.require('i18n').__
+  semver = env.require 'semver'
 
   class RestApi extends env.plugins.Plugin
     config: null
