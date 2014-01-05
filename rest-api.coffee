@@ -157,5 +157,20 @@ module.exports = (env) ->
             removed.push p.plugin
         framework.saveConfig()
         sendSuccessResponse res, removed: removed
-        
+
+
+      app.get "/api/outdated/pimatic", (req, res, next) =>
+        framework.pluginManager.isPimaticOutdated().then( (result) =>
+          sendSuccessResponse res, isOutdated: result 
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+
+      app.get "/api/outdated/plugins", (req, res, next) =>
+        framework.pluginManager.getOutdatedPlugins().then( (result, t2) =>
+          sendSuccessResponse res, outdated: result 
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+       
   return new RestApi
