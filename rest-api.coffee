@@ -180,4 +180,11 @@ module.exports = (env) ->
           sendErrorResponse res, error, 406
         ).done()
        
+      app.get "/api/restart", (req, res, next) =>
+        try
+          framework.restart()
+          endSuccessResponse res
+        catch error
+          sendErrorResponse res, error, 406
+
   return new RestApi
