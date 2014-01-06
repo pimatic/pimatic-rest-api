@@ -178,7 +178,7 @@ module.exports = (env) ->
       app.get "/api/restart", (req, res, next) =>
         try
           framework.restart()
-          endSuccessResponse res
+          sendSuccessResponse res
         catch error
           sendErrorResponse res, error, 406
 
