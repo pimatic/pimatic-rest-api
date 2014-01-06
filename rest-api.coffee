@@ -26,8 +26,8 @@ module.exports = (env) ->
           message = error
         res.send statusCode, {success: false, error: message}
 
-      app.get "/api/actuator/:actuatorId/:actionName", (req, res, next) =>
-        actuator = framework.getActuatorById req.params.actuatorId
+      app.get "/api/device/:actuatorId/:actionName", (req, res, next) =>
+        actuator = framework.getDeviceById req.params.actuatorId
         if actuator?
           #TODO: add parms support
           if actuator.hasAction req.params.actionName
@@ -38,8 +38,8 @@ module.exports = (env) ->
               sendErrorResponse res, error, 500
             ).done()
           else
-            sendErrorResponse res, 'actuator hasn\'t that action'
-        else sendErrorResponse res, 'actuator not found'
+            sendErrorResponse res, 'device hasn\'t that action'
+        else sendErrorResponse res, 'device not found'
 
 
       app.post "/api/rule/:ruleId/update", (req, res, next) =>
@@ -78,15 +78,10 @@ module.exports = (env) ->
         memoryTransport = env.logger.transports.memory
         sendSuccessResponse res, { messages: memoryTransport.getBuffer() }
 
-      app.get "/api/list/actuators", (req, res, next) =>
-        actuatorList = for id, a of framework.actuators 
+      app.get "/api/devices", (req, res, next) =>
+        devicesList = for id, a of framework.devices 
           id: a.id, name: a.name
-        sendSuccessResponse res, { actuators: actuatorList }
-
-      app.get "/api/list/sensors", (req, res, next) =>
-        sensorList = for id, s of framework.sensors 
-          id: s.id, name: s.name
-        sendSuccessResponse res, { sensors: sensorList}
+        sendSuccessResponse res, { devices: devicesList }
 
       app.get "/api/plugins/installed", (req, res, next) =>
         framework.pluginManager.getInstalledPlugins().then( (plugins) =>

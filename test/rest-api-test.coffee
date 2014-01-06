@@ -18,7 +18,7 @@ module.exports = (env) ->
       it 'should init', ->
         plugin.init app, frameworkDummy, {}
 
-    describe "get /api/actuator/:actuatorId/:actionName", ->
+    describe "get /api/device/:actuatorId/:actionName", ->
 
       it 'should execute the action', (finish) ->
 
@@ -34,13 +34,13 @@ module.exports = (env) ->
             return Q.fcall -> true
 
         getActuatorByIdCalled = false
-        frameworkDummy.getActuatorById = (id) ->
+        frameworkDummy.getDeviceById = (id) ->
           assert id is 'testId'
           getActuatorByIdCalled = true
           return actuatorDummy
 
         request(app)
-          .get('/api/actuator/testId/testAction')
+          .get('/api/device/testId/testAction')
           .expect('Content-Type', /json/)
           .expect(200)
           .end( (err) ->
@@ -54,7 +54,7 @@ module.exports = (env) ->
       it 'should reject unknown actuator', ->
 
         getActuatorByIdCalled = false
-        frameworkDummy.getActuatorById = (id) ->
+        frameworkDummy.getDeviceById = (id) ->
           assert id is 'testId'
           getActuatorByIdCalled = true
           return null
@@ -237,11 +237,11 @@ module.exports = (env) ->
             finish()
           )
 
-    describe "get /api/list/actuators", ->
+    describe "get /api/devices", ->
 
-      it 'should return the actuators list', (finish) ->
+      it 'should return the devices list', (finish) ->
 
-        frameworkDummy.actuators = [
+        frameworkDummy.devices = [
           {
             id: 'id1'
             name: 'name1'
@@ -253,31 +253,7 @@ module.exports = (env) ->
         ]
 
         request(app)
-          .get('/api/list/actuators')
-          .expect('Content-Type', /json/)
-          .expect(200)
-          .end( (err, res) ->
-            if err then return finish err
-            finish()
-          )
-
-      describe "get /api/list/sensors", ->
-
-      it 'should return the sensors list', (finish) ->
-
-        frameworkDummy.sensors = [
-          {
-            id: 'id1'
-            name: 'name1'
-          }
-          {
-            id: 'id2'
-            name: 'name2'
-          }
-        ]
-
-        request(app)
-          .get('/api/list/sensors')
+          .get('/api/devices')
           .expect('Content-Type', /json/)
           .expect(200)
           .end( (err, res) ->
