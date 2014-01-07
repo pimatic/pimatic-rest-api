@@ -150,11 +150,13 @@ module.exports = (env) ->
         plugins = req.body.plugins
         unless plugins? then return sendErrorResponse res, "No plugins given", 400
         removed = []
-        for p, i in framework.config.plugins
-          if p.plugin in plugins
-            framework.config.plugins.splice(i, 1)
-            removed.push p.plugin
-        framework.saveConfig()
+        for pToRemove in plugins
+          for p, i in framework.config.plugins
+            if p.plugin is pToRemove
+              framework.config.plugins.splice(i, 1)
+              removed.push p.plugin
+              break
+          framework.saveConfig()
         sendSuccessResponse res, removed: removed
 
       app.get "/api/outdated/pimatic", (req, res, next) =>
