@@ -45,9 +45,10 @@ module.exports = (env) ->
       app.post "/api/rule/:ruleId/update", (req, res, next) =>
         ruleId = req.params.ruleId
         ruleString = req.body.rule
+        active = (req.body.active is "true")
         unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
         unless ruleString? then return sendErrorResponse res, 'No rule given', 400
-        framework.ruleManager.updateRuleByString(ruleId, ruleString).then( =>
+        framework.ruleManager.updateRuleByString(ruleId, ruleString, active).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
@@ -59,8 +60,11 @@ module.exports = (env) ->
         
       app.post "/api/rule/:ruleId/add", (req, res, next) =>
         ruleId = req.params.ruleId
-        ruleText = req.body.rule
-        framework.ruleManager.addRuleByString(ruleId, ruleText).then( =>
+        ruleString = req.body.rule
+        active = (req.body.active is "true")
+        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
+        unless ruleString? then return sendErrorResponse res, 'No rule given', 400
+        framework.ruleManager.addRuleByString(ruleId, ruleString, active).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
