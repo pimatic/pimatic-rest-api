@@ -8,7 +8,7 @@
     "rest-api.coffee",
     "README.md"
   ],
-  "version": "0.4.1",
+  "version": "0.5.0",
   "homepage": "http://github.com/sweetpi/pimatic",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "pimatic": "0.4.*"
+    "pimatic": "0.5.*"
   },
   "engines": {
     "node": ">0.8.x",
