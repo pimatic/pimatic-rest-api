@@ -25,6 +25,9 @@ module.exports = (env) ->
         hasActionCalled = false
         testActionCalled = false
         actuatorDummy =
+          actions:
+            testAction:
+              params: {}
           hasAction: (actionName) ->
             assert actionName is 'testAction'
             hasActionCalled = true

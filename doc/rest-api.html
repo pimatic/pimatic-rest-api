@@ -6,6 +6,7 @@
   <span class="nv">assert = </span><span class="nx">env</span><span class="p">.</span><span class="nx">require</span> <span class="s">&#39;cassert&#39;</span>
   <span class="nv">__ = </span><span class="nx">env</span><span class="p">.</span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;i18n&#39;</span><span class="p">).</span><span class="nx">__</span>
   <span class="nv">semver = </span><span class="nx">env</span><span class="p">.</span><span class="nx">require</span> <span class="s">&#39;semver&#39;</span>
+  <span class="nv">_ = </span><span class="nx">env</span><span class="p">.</span><span class="nx">require</span> <span class="s">&#39;lodash&#39;</span>
 
   <span class="k">class</span> <span class="nx">RestApi</span> <span class="k">extends</span> <span class="nx">env</span><span class="p">.</span><span class="nx">plugins</span><span class="p">.</span><span class="nx">Plugin</span>
     <span class="nv">config: </span><span class="kc">null</span>
@@ -29,9 +30,19 @@
       <span class="nx">app</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;/api/device/:actuatorId/:actionName&quot;</span><span class="p">,</span> <span class="nf">(req, res, next) =&gt;</span>
         <span class="nv">actuator = </span><span class="nx">framework</span><span class="p">.</span><span class="nx">getDeviceById</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">actuatorId</span>
         <span class="k">if</span> <span class="nx">actuator</span><span class="o">?</span>
-          <span class="c1">#TODO: add parms support</span>
           <span class="k">if</span> <span class="nx">actuator</span><span class="p">.</span><span class="nx">hasAction</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">actionName</span>
-            <span class="nv">result = </span><span class="nx">actuator</span><span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">actionName</span><span class="p">]()</span> 
+            <span class="nv">action = </span><span class="nx">actuator</span><span class="p">.</span><span class="nx">actions</span><span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">actionName</span><span class="p">]</span>
+            <span class="k">unless</span> <span class="nx">_</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">).</span><span class="nx">length</span> <span class="o">is</span> <span class="nx">_</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">params</span><span class="p">).</span><span class="nx">length</span>
+              <span class="nx">sendErrorResponse</span> <span class="nx">res</span><span class="p">,</span> <span class="s">&#39;wrong param count&#39;</span>
+              <span class="k">return</span>
+            <span class="nv">params = </span><span class="p">[]</span>
+            <span class="k">for</span> <span class="nx">p</span> <span class="k">of</span> <span class="nx">action</span><span class="p">.</span><span class="nx">params</span>
+              <span class="k">unless</span> <span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">[</span><span class="nx">p</span><span class="p">]</span><span class="o">?</span>
+                <span class="nx">sendErrorResponse</span> <span class="nx">res</span><span class="p">,</span> <span class="s">&quot;expected param: </span><span class="si">#{</span><span class="nx">p</span><span class="si">}</span><span class="s">&quot;</span>
+                <span class="k">return</span>
+              <span class="nx">params</span><span class="p">.</span><span class="nx">push</span> <span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">[</span><span class="nx">p</span><span class="p">]</span>
+
+            <span class="nv">result = </span><span class="nx">actuator</span><span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">actionName</span><span class="p">](</span><span class="nx">params</span><span class="p">...)</span> 
             <span class="nx">Q</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span>  <span class="o">=&gt;</span>
               <span class="nx">sendSuccessResponse</span> <span class="nx">res</span>
             <span class="p">).</span><span class="nx">catch</span><span class="p">(</span> <span class="nf">(error) =&gt;</span>

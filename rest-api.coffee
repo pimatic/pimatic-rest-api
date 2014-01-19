@@ -6,6 +6,7 @@ module.exports = (env) ->
   assert = env.require 'cassert'
   __ = env.require('i18n').__
   semver = env.require 'semver'
+  _ = env.require 'lodash'
 
   class RestApi extends env.plugins.Plugin
     config: null
@@ -29,9 +30,19 @@ module.exports = (env) ->
       app.get "/api/device/:actuatorId/:actionName", (req, res, next) =>
         actuator = framework.getDeviceById req.params.actuatorId
         if actuator?
-          #TODO: add parms support
           if actuator.hasAction req.params.actionName
-            result = actuator[req.params.actionName]() 
+            action = actuator.actions[req.params.actionName]
+            unless _.keys(req.query).length is _.keys(action.params).length
+              sendErrorResponse res, 'wrong param count'
+              return
+            params = []
+            for p of action.params
+              unless req.query[p]?
+                sendErrorResponse res, "expected param: #{p}"
+                return
+              params.push req.query[p]
+
+            result = actuator[req.params.actionName](params...) 
             Q.when(result,  =>
               sendSuccessResponse res
             ).catch( (error) =>
