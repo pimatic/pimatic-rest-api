@@ -66,6 +66,29 @@ module.exports = (env) ->
         ).done()
 
 
+      app.get "/api/rule/:ruleId/activate", (req, res, next) =>
+        ruleId = req.params.ruleId
+        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
+        rule = framework.ruleManager.rules[ruleId]
+        unless rule? then return sendErrorResponse res, 'Rule not found', 400
+        framework.ruleManager.updateRuleByString(ruleId, rule.string, true).then( =>
+          sendSuccessResponse res, message: 'rule activated'
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+
+      app.get "/api/rule/:ruleId/deactivate", (req, res, next) =>
+        ruleId = req.params.ruleId
+        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
+        rule = framework.ruleManager.rules[ruleId]
+        unless rule? then return sendErrorResponse res, 'Rule not found', 400
+        framework.ruleManager.updateRuleByString(ruleId, rule.string, false).then( =>
+          sendSuccessResponse res, message: "rule deactivated"
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+
+
       app.post "/api/rule//add", (req, res, next) =>
         sendErrorResponse res, 'No id given', 400
         
