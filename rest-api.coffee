@@ -98,6 +98,16 @@ module.exports = (env) ->
         active = (req.body.active is "true")
         unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
         unless ruleString? then return sendErrorResponse res, 'No rule given', 400
+
+        unless ruleId.match /^[a-z0-9\-_]+$/i
+          return sendErrorResponse(
+            res, 
+            "rule id must only contain alpha numerical symbols, \"-\" and  \"_\"",
+            400
+          )
+        if framework.ruleManager.rules[ruleId]?
+         return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
+
         framework.ruleManager.addRuleByString(ruleId, ruleString, active).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
