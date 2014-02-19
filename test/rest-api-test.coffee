@@ -9,7 +9,8 @@ module.exports = (env) ->
 
     plugin = (require 'pimatic-rest-api') env
     frameworkDummy = 
-      ruleManager: {}
+      ruleManager:
+        rules: {}
     app = express()
     app.use express.bodyParser()
 

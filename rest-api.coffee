@@ -106,7 +106,7 @@ module.exports = (env) ->
             400
           )
         if framework.ruleManager.rules[ruleId]?
-         return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
+          return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
 
         framework.ruleManager.addRuleByString(ruleId, ruleString, active).then( =>
           sendSuccessResponse res
