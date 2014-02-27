@@ -211,8 +211,12 @@ module.exports = (env) ->
         ).done()
 
       app.get "/api/outdated/plugins", (req, res, next) =>
-        framework.pluginManager.getOutdatedPlugins().then( (result, t2) =>
-          sendSuccessResponse res, outdated: result 
+        framework.pluginManager.getOutdatedPlugins().then( (result) =>
+          outdated = []
+          for i, p of result
+            if semver.gt(p.installed, p.latest)
+              outdated.push p
+          sendSuccessResponse res, outdated: outdated 
         ).catch( (error) =>
           sendErrorResponse res, error, 406
         ).done()
