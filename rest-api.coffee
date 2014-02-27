@@ -214,7 +214,7 @@ module.exports = (env) ->
         framework.pluginManager.getOutdatedPlugins().then( (result) =>
           outdated = []
           for i, p of result
-            if semver.gt(p.installed, p.latest)
+            if semver.gt(p.latest, p.current)
               outdated.push p
           sendSuccessResponse res, outdated: outdated 
         ).catch( (error) =>
