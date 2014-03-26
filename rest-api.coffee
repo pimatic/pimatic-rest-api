@@ -114,6 +114,62 @@ module.exports = (env) ->
           sendErrorResponse res, error, 406
         ).done()
 
+      app.post "/api/variable/:name/add", (req, res, next) =>
+        variableName = req.params.name
+        variableValue = req.body.value
+        unless variableName? then return sendErrorResponse res, 'No name given', 400
+        unless variableValue? then return sendErrorResponse res, 'No value given', 400
+
+        unless variableName.match /^[a-z0-9\-_]+$/i
+          return sendErrorResponse(
+            res, 
+            "variable name must only contain alpha numerical symbols, \"-\" and  \"_\"",
+            400
+          )
+
+        if framework.variableManager.isVariableDefined(variableName)
+          return sendErrorResponse(res, 
+            "There is already a variable with the name \"#{variableName}\"", 400
+          )
+
+        Q.fcall( -> framework.variableManager.setVariable(variableName, variableValue)).then( =>
+          sendSuccessResponse res
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+
+      app.post "/api/variable/:name/update", (req, res, next) =>
+        variableName = req.params.name
+        variableValue = req.body.value
+        unless variableName? then return sendErrorResponse res, 'No name given', 400
+        unless variableValue? then return sendErrorResponse res, 'No value given', 400
+
+        unless variableName.match /^[a-z0-9\-_]+$/i
+          return sendErrorResponse(
+            res, 
+            "variable name must only contain alpha numerical symbols, \"-\" and  \"_\"",
+            400
+          )
+
+        unless framework.variableManager.isVariableDefined(variableName)
+          return sendErrorResponse(res, 
+            "No variable with the name \"#{variableName}\" found.", 400
+          )
+
+        Q.fcall( -> framework.variableManager.setVariable(variableName, variableValue)).then( =>
+          sendSuccessResponse res
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+
+      app.get "/api/variable/:name/remove", (req, res, next) =>
+        variableName = req.params.name
+        try
+          framework.variableManager.removeVariable(variableName)
+          sendSuccessResponse res
+        catch error
+          sendErrorResponse res, error, 500
+
       app.get "/api/rule/:ruleId/remove", (req, res, next) =>
         ruleId = req.params.ruleId
         try
