@@ -7,6 +7,7 @@ module.exports = (env) ->
   __ = env.require('i18n').__
   semver = env.require 'semver'
   _ = env.require 'lodash'
+  M = env.matcher
 
   class RestApi extends env.plugins.Plugin
     config: null
@@ -114,11 +115,26 @@ module.exports = (env) ->
           sendErrorResponse res, error, 406
         ).done()
 
+
+      updateVariable = (variableName, variableValue, variableExpression) ->
+        if variableValue?
+          framework.variableManager.setVariableToValue(variableName, variableValue)
+        else
+          tokens = null
+          if variableExpression.length is 0
+            throw new Error("No expression given")
+          m = M(variableExpression).matchAnyExpression((m, ts) => tokens = ts)
+          unless m.hadMatches() and m.getFullMatches()[0] is variableExpression
+            throw new Error("no match")
+          framework.variableManager.setVariableToExpr(variableName, tokens, variableExpression)
+
       app.post "/api/variable/:name/add", (req, res, next) =>
         variableName = req.params.name
         variableValue = req.body.value
+        variableExpression = req.body.expression
         unless variableName? then return sendErrorResponse res, 'No name given', 400
-        unless variableValue? then return sendErrorResponse res, 'No value given', 400
+        unless variableValue? or variableExpression?
+          return sendErrorResponse res, 'No value or expression given', 400
 
         unless variableName.match /^[a-z0-9\-_]+$/i
           return sendErrorResponse(
@@ -132,7 +148,9 @@ module.exports = (env) ->
             "There is already a variable with the name \"#{variableName}\"", 400
           )
 
-        Q.fcall( -> framework.variableManager.setVariable(variableName, variableValue)).then( =>
+        Q.fcall( => 
+          updateVariable(variableName, variableValue, variableExpression)
+        ).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
@@ -141,8 +159,10 @@ module.exports = (env) ->
       app.post "/api/variable/:name/update", (req, res, next) =>
         variableName = req.params.name
         variableValue = req.body.value
+        variableExpression = req.body.expression
         unless variableName? then return sendErrorResponse res, 'No name given', 400
-        unless variableValue? then return sendErrorResponse res, 'No value given', 400
+        unless variableValue? or variableExpression?
+          return sendErrorResponse res, 'No value or expression given', 400
 
         unless variableName.match /^[a-z0-9\-_]+$/i
           return sendErrorResponse(
@@ -156,7 +176,9 @@ module.exports = (env) ->
             "No variable with the name \"#{variableName}\" found.", 400
           )
 
-        Q.fcall( -> framework.variableManager.setVariable(variableName, variableValue)).then( =>
+        Q.fcall( => 
+          updateVariable(variableName, variableValue, variableExpression)
+        ).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
