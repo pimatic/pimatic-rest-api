@@ -209,6 +209,10 @@ module.exports = (env) ->
           id: a.id, name: a.name
         sendSuccessResponse res, { devices: devicesList }
 
+      app.get "/api/variables", (req, res, next) =>
+        variableList = framework.variableManager.getAllVariables()
+        sendSuccessResponse res, { variables: variableList }
+
       app.get "/api/plugins/installed", (req, res, next) =>
         framework.pluginManager.getInstalledPlugins().then( (plugins) =>
 
