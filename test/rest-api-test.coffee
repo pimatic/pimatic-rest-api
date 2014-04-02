@@ -83,7 +83,7 @@ module.exports = (env) ->
       it 'should call updateRuleByString', (finish) ->
 
         updateRuleByStringCalled = false
-        frameworkDummy.ruleManager.updateRuleByString = (id, ruleString) ->
+        frameworkDummy.ruleManager.updateRuleByString = (id, name, ruleString) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           updateRuleByStringCalled = true
@@ -91,7 +91,7 @@ module.exports = (env) ->
 
         request(app)
           .post('/api/rule/test-id/update')
-          .send(rule: 'if 1 then 2')  
+          .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(200)
           .end( (err) ->
@@ -103,7 +103,7 @@ module.exports = (env) ->
       it 'should reject if errors', (finish) ->
 
         updateRuleByStringCalled = false
-        frameworkDummy.ruleManager.updateRuleByString = (id, ruleString) ->
+        frameworkDummy.ruleManager.updateRuleByString = (id, name, ruleString) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           updateRuleByStringCalled = true
@@ -111,7 +111,7 @@ module.exports = (env) ->
 
         request(app)
           .post('/api/rule/test-id/update')
-          .send(rule: 'if 1 then 2')  
+          .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(406)
           .end( (err, res) ->
@@ -131,7 +131,7 @@ module.exports = (env) ->
       it 'should call addRuleByString', (finish) ->
 
         addRuleByStringCalled = false
-        frameworkDummy.ruleManager.addRuleByString = (id, ruleString) ->
+        frameworkDummy.ruleManager.addRuleByString = (id, name, ruleString) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           addRuleByStringCalled = true
@@ -139,7 +139,7 @@ module.exports = (env) ->
 
         request(app)
           .post('/api/rule/test-id/add')
-          .send(rule: 'if 1 then 2')  
+          .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(200)
           .end( (err) ->
@@ -151,7 +151,7 @@ module.exports = (env) ->
       it 'should reject if errors', (finish) ->
 
         addRuleByStringCalled = false
-        frameworkDummy.ruleManager.addRuleByString = (id, ruleString) ->
+        frameworkDummy.ruleManager.addRuleByString = (id, name, ruleString) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           addRuleByStringCalled = true
@@ -159,7 +159,7 @@ module.exports = (env) ->
 
         request(app)
           .post('/api/rule/test-id/add')
-          .send(rule: 'if 1 then 2')  
+          .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(406)
           .end( (err, res) ->
