@@ -128,7 +128,7 @@ module.exports = (env) ->
           if variableExpression.length is 0
             throw new Error("No expression given")
           m = M(variableExpression).matchAnyExpression((m, ts) => tokens = ts)
-          unless m.hadMatches() and m.getFullMatches()[0] is variableExpression
+          unless m.hadMatch() and m.getFullMatch() is variableExpression
             throw new Error("no match")
           framework.variableManager.setVariableToExpr(variableName, tokens, variableExpression)
 
