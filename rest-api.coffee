@@ -53,53 +53,61 @@ module.exports = (env) ->
             sendErrorResponse res, 'device hasn\'t that action'
         else sendErrorResponse res, 'device not found'
 
+      handleRuleActiveState = ( (req, res, active) =>
+        ruleId = req.params.ruleId
+        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
+        rule = framework.ruleManager.rules[ruleId]
+        unless rule? then return sendErrorResponse res, 'Rule not found', 400
+        framework.ruleManager.updateRuleByString(
+          ruleId, 
+          rule.name, 
+          rule.string, 
+          active, 
+          rule.logging
+        ).then( =>
+          message = (if active then 'rule activated' else "rule deactivated")
+          sendSuccessResponse res, message: message
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+      )
 
+      app.get "/api/rule/:ruleId/activate", (req, res, next) =>
+        handleRuleActiveState(req, res, yes)
+
+      app.get "/api/rule/:ruleId/deactivate", (req, res, next) =>
+        handleRuleActiveState(req, res, no)
+
+      app.post "/api/rule//add", (req, res, next) =>
+        sendErrorResponse res, 'No id given', 400
+        
       app.post "/api/rule/:ruleId/update", (req, res, next) =>
         ruleId = req.params.ruleId
         ruleString = req.body.rule
         ruleName = req.body.name
         active = (req.body.active is "true")
+        logging = (req.body.logging is "true")
         unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
         unless ruleName? then return sendErrorResponse res, 'No name given', 400
         unless ruleString? then return sendErrorResponse res, 'No rule given', 400
-        framework.ruleManager.updateRuleByString(ruleId, ruleName, ruleString, active).then( =>
+        framework.ruleManager.updateRuleByString(
+          ruleId, 
+          ruleName, 
+          ruleString, 
+          active, 
+          logging
+        ).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
         ).done()
 
-
-      app.get "/api/rule/:ruleId/activate", (req, res, next) =>
-        ruleId = req.params.ruleId
-        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
-        rule = framework.ruleManager.rules[ruleId]
-        unless rule? then return sendErrorResponse res, 'Rule not found', 400
-        framework.ruleManager.updateRuleByString(ruleId, rule.name, rule.string, true).then( =>
-          sendSuccessResponse res, message: 'rule activated'
-        ).catch( (error) =>
-          sendErrorResponse res, error, 406
-        ).done()
-
-      app.get "/api/rule/:ruleId/deactivate", (req, res, next) =>
-        ruleId = req.params.ruleId
-        unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
-        rule = framework.ruleManager.rules[ruleId]
-        unless rule? then return sendErrorResponse res, 'Rule not found', 400
-        framework.ruleManager.updateRuleByString(ruleId, rule.name, rule.string, false).then( =>
-          sendSuccessResponse res, message: "rule deactivated"
-        ).catch( (error) =>
-          sendErrorResponse res, error, 406
-        ).done()
-
-
-      app.post "/api/rule//add", (req, res, next) =>
-        sendErrorResponse res, 'No id given', 400
-        
       app.post "/api/rule/:ruleId/add", (req, res, next) =>
         ruleId = req.params.ruleId
         ruleString = req.body.rule
         ruleName = req.body.name
         active = (req.body.active is "true")
+        logging = (req.body.logging is "true")
         unless ruleId? then return sendErrorResponse res, 'No ruleId given', 400
         unless ruleName? then return sendErrorResponse res, 'No name given', 400
         unless ruleString? then return sendErrorResponse res, 'No rule given', 400
@@ -113,7 +121,14 @@ module.exports = (env) ->
         if framework.ruleManager.rules[ruleId]?
           return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
 
-        framework.ruleManager.addRuleByString(ruleId, ruleName, ruleString, active).then( =>
+        console.log "logging:", logging
+        framework.ruleManager.addRuleByString(
+          ruleId, 
+          ruleName, 
+          ruleString, 
+          active, 
+          logging
+        ).then( =>
           sendSuccessResponse res
         ).catch( (error) =>
           sendErrorResponse res, error, 406
