@@ -324,7 +324,13 @@ module.exports = (env) ->
 
       app.post "/api/update", (req, res, next) =>
         modules = req.body.modules
-        framework.pluginManager.update(modules).then( (result) =>
+        deferred = Q.defer()
+        # resolve when complete
+        framework.pluginManager.update(modules).then(deferred.resolve)
+        # or after 10 seconds to prevent a timeout
+        Q.delay('still running', 10000).then(deferred.resolve)
+        # If the promise gets fullfilled:
+        deferred.promise.then( (result) =>
           sendSuccessResponse res, result: result
         ).catch( (error) =>
           sendErrorResponse res, error, 406
