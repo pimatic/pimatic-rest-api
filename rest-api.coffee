@@ -121,7 +121,6 @@ module.exports = (env) ->
         if framework.ruleManager.rules[ruleId]?
           return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
 
-        console.log "logging:", logging
         framework.ruleManager.addRuleByString(
           ruleId, 
           ruleName, 
@@ -219,9 +218,13 @@ module.exports = (env) ->
         catch error
           sendErrorResponse res, error, 500
 
-      app.get "/api/messages", (req, res, next) =>
-        memoryTransport = env.logger.transports.memory
-        sendSuccessResponse res, { messages: memoryTransport.getBuffer() }
+      app.get("/api/messages", (req, res, next) =>
+        framework.eventlog.queryMessages().then( (result) =>
+           sendSuccessResponse res, { messages: result }
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+      )
 
       app.get "/api/devices", (req, res, next) =>
         devicesList = for id, a of framework.devices 
