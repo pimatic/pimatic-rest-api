@@ -121,7 +121,6 @@ module.exports = (env) ->
         if framework.ruleManager.rules[ruleId]?
           return sendErrorResponse res, "There is already a rule with the id \"#{ruleId}\"", 400
 
-        console.log "logging:", logging
         framework.ruleManager.addRuleByString(
           ruleId, 
           ruleName, 
@@ -134,6 +133,9 @@ module.exports = (env) ->
           sendErrorResponse res, error, 406
         ).done()
 
+      app.get "/api/rules", (req, res, next) =>
+        ruleList = framework.ruleManager.getAllRules()
+        sendSuccessResponse res, { rules: ruleList }
 
       updateVariable = (variableName, variableValue, variableExpression) ->
         if variableValue?
