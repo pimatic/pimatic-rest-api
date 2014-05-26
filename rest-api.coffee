@@ -38,7 +38,7 @@ module.exports = (env) ->
             params.push req.query[pName]
           else unless p.optional
             throw new Error("expected param: #{pName}")
-        console.log actionName, params, req.query
+        #console.log actionName, params, req.query
         return Q.fcall( => binding[actionName](params...) )    
 
       app.get "/api/device/:actuatorId/:actionName", (req, res, next) =>
@@ -236,7 +236,12 @@ module.exports = (env) ->
           app.get("/api/eventlog/#{actionName}", (req, res, next) =>
             Q.fcall( => callActionFromReq(actionName, action, framework.eventlog, req))
             .then( (result) =>
-               sendSuccessResponse res, {result}
+              resultName = (
+                if action.result? then (key for key of action.result)[0]
+                else "result"
+              )
+              response = {}; response[resultName] = result
+              sendSuccessResponse res, response
             ).catch( (error) =>
               sendErrorResponse res, error, 406
             ).done()
