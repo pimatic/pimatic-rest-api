@@ -231,10 +231,10 @@ module.exports = (env) ->
         catch error
           sendErrorResponse res, error, 500
 
-      for actionName, action of env.events.api.actions
+      for actionName, action of env.database.api.actions
         do (actionName, action) =>
-          app.get("/api/eventlog/#{actionName}", (req, res, next) =>
-            Q.fcall( => callActionFromReq(actionName, action, framework.eventlog, req))
+          app.get("/api/database/#{actionName}", (req, res, next) =>
+            Q.fcall( => callActionFromReq(actionName, action, framework.database, req))
             .then( (result) =>
               resultName = (
                 if action.result? then (key for key of action.result)[0]
@@ -249,7 +249,7 @@ module.exports = (env) ->
 
 
       app.get("/api/messages", (req, res, next) =>
-        framework.eventlog.queryMessages().then( (result) =>
+        framework.database.queryMessages().then( (result) =>
            sendSuccessResponse res, { messages: result }
         ).catch( (error) =>
           sendErrorResponse res, error, 406
@@ -259,7 +259,7 @@ module.exports = (env) ->
 
       app.get("/api/messages/delete", (req, res, next) =>
         beforeTime = req.params.beforeTime or new Date()
-        framework.eventlog.deleteMessagesOlderThan(beforeTime).then( (result) =>
+        framework.database.deleteMessagesOlderThan(beforeTime).then( (result) =>
            sendSuccessResponse res, {}
         ).catch( (error) =>
           sendErrorResponse res, error, 406
