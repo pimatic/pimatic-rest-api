@@ -28,6 +28,19 @@ module.exports = (env) ->
           message = error
         res.send statusCode, {success: false, error: message}
 
+      callActionFromReq = (actionName, actionDef, binding, req) =>
+        # actual ṕaram count can be smaller because of optional arguments
+        unless _.keys(req.query).length <= _.keys(actionDef.params).length
+          throw new Error('wrong param count')
+        params = []
+        for pName, p of actionDef.params
+          if req.query[pName]?
+            params.push req.query[pName]
+          else unless p.optional
+            throw new Error("expected param: #{pName}")
+        #console.log actionName, params, req.query
+        return Q.fcall( => binding[actionName](params...) )    
+
       app.get "/api/device/:actuatorId/:actionName", (req, res, next) =>
         actuator = framework.getDeviceById req.params.actuatorId
         if actuator?
@@ -221,9 +234,41 @@ module.exports = (env) ->
         catch error
           sendErrorResponse res, error, 500
 
-      app.get "/api/messages", (req, res, next) =>
-        memoryTransport = env.logger.transports.memory
-        sendSuccessResponse res, { messages: memoryTransport.getBuffer() }
+      for actionName, action of env.database.api.actions
+        do (actionName, action) =>
+          app.get("/api/database/#{actionName}", (req, res, next) =>
+            Q.fcall( => callActionFromReq(actionName, action, framework.database, req))
+            .then( (result) =>
+              resultName = (
+                if action.result? then (key for key of action.result)[0]
+                else "result"
+              )
+              response = {}; response[resultName] = result
+              sendSuccessResponse res, response
+            ).catch( (error) =>
+              sendErrorResponse res, error, 406
+            ).done()
+          )
+
+
+      app.get("/api/messages", (req, res, next) =>
+        framework.database.queryMessages().then( (result) =>
+           sendSuccessResponse res, { messages: result }
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+      )
+
+
+      app.get("/api/messages/delete", (req, res, next) =>
+        beforeTime = req.params.beforeTime or new Date()
+        framework.database.deleteMessagesOlderThan(beforeTime).then( (result) =>
+           sendSuccessResponse res, {}
+        ).catch( (error) =>
+          sendErrorResponse res, error, 406
+        ).done()
+      )
+
 
       app.get "/api/devices", (req, res, next) =>
         devicesList = for id, a of framework.devices 

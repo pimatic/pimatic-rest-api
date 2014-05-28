@@ -74,11 +74,11 @@ module.exports = (env) ->
             )
     describe "post /api/rule/:ruleId/update", ->
 
-      before ->
-        env.logger.transports.console.level = 'ignore'
+      #before ->
+      #  env.logger.transports.console.level = 'ignore'
 
-      after ->
-        env.logger.transports.console.level = 'error'
+      #after ->
+      #  env.logger.transports.console.level = 'error'
 
       it 'should call updateRuleByString', (finish) ->
 
@@ -122,12 +122,6 @@ module.exports = (env) ->
 
     describe "post /api/rule/:ruleId/add", ->
 
-      before ->
-        env.logger.transports.console.level = 'ignore'
-
-      after ->
-        env.logger.transports.console.level = 'error'
-
       it 'should call addRuleByString', (finish) ->
 
         addRuleByStringCalled = false
@@ -169,12 +163,6 @@ module.exports = (env) ->
           )
 
     describe "get /api/rule/:ruleId/remove", ->
-
-      before ->
-        env.logger.transports.console.level = 'ignore'
-
-      after ->
-        env.logger.transports.console.level = 'error'
 
       it 'should call removeRule', (finish) ->
 
