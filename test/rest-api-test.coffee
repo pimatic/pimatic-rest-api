@@ -83,7 +83,7 @@ module.exports = (env) ->
       it 'should call updateRuleByString', (finish) ->
 
         updateRuleByStringCalled = false
-        frameworkDummy.ruleManager.updateRuleByString = (id, name, ruleString) ->
+        frameworkDummy.ruleManager.updateRuleByString = (id, {name, ruleString}) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           updateRuleByStringCalled = true
@@ -103,7 +103,7 @@ module.exports = (env) ->
       it 'should reject if errors', (finish) ->
 
         updateRuleByStringCalled = false
-        frameworkDummy.ruleManager.updateRuleByString = (id, name, ruleString) ->
+        frameworkDummy.ruleManager.updateRuleByString = (id, {name, ruleString}) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           updateRuleByStringCalled = true
@@ -125,7 +125,7 @@ module.exports = (env) ->
       it 'should call addRuleByString', (finish) ->
 
         addRuleByStringCalled = false
-        frameworkDummy.ruleManager.addRuleByString = (id, name, ruleString) ->
+        frameworkDummy.ruleManager.addRuleByString = (id, {name, ruleString}) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           addRuleByStringCalled = true
@@ -145,7 +145,7 @@ module.exports = (env) ->
       it 'should reject if errors', (finish) ->
 
         addRuleByStringCalled = false
-        frameworkDummy.ruleManager.addRuleByString = (id, name, ruleString) ->
+        frameworkDummy.ruleManager.addRuleByString = (id, {name, ruleString}) ->
           assert id is 'test-id'
           assert ruleString is 'if 1 then 2'
           addRuleByStringCalled = true
