@@ -272,7 +272,7 @@ module.exports = (env) ->
 
       app.get "/api/devices", (req, res, next) =>
         devicesList = for id, a of framework.devices 
-          id: a.id, name: a.name
+          id: a.id, name: a.name, template: a.template
         sendSuccessResponse res, { devices: devicesList }
 
       app.get "/api/variables", (req, res, next) =>
