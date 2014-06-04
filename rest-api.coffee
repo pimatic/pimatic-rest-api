@@ -8,7 +8,7 @@ module.exports = (env) ->
   semver = env.require 'semver'
   _ = env.require 'lodash'
   M = env.matcher
-  api = env.require 'dec-api'
+  api = env.require 'decl-api'
 
   class RestApi extends env.plugins.Plugin
     config: null
@@ -33,6 +33,9 @@ module.exports = (env) ->
             api.sendErrorResponse(res, 'device hasn\'t that action')
         else api.sendErrorResponse(res, 'device not found')
       )
+
+      app.get("/api", (req, res, nest) => res.send(api.stringifyApi(env.api.all)) )
+      app.get("/api/decl-api-client.js", api.serveClient)
 
       api.createExpressRestApi(app, env.api.framework.actions, framework, onError)
       api.createExpressRestApi(app, env.api.rules.actions, framework.ruleManager, onError)
