@@ -120,7 +120,7 @@ module.exports = (env) ->
             finish()
           )
 
-    describe "post /api/rule/:ruleId/add", ->
+    describe "post /api/rule/:ruleId", ->
 
       it 'should call addRuleByString', (finish) ->
 
@@ -132,7 +132,7 @@ module.exports = (env) ->
           return Q.fcall -> true
 
         request(app)
-          .post('/api/rule/test-id/add')
+          .post('/api/rule/test-id')
           .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(200)
@@ -152,7 +152,7 @@ module.exports = (env) ->
           return Q.fcall -> throw new Error('a expected error')
 
         request(app)
-          .post('/api/rule/test-id/add')
+          .post('/api/rule/test-id')
           .send(rule: 'if 1 then 2', name:'test')  
           .expect('Content-Type', /json/)
           .expect(406)
