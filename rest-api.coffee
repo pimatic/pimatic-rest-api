@@ -28,7 +28,6 @@ module.exports = (env) ->
         if device?
           if device.hasAction(actionName)
             action = device.actions[actionName]
-            console.log action
             api.callActionFromReqAndRespond(actionName, action, device, req, res)
           else
             api.sendErrorResponse(res, 'device hasn\'t that action')
