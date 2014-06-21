@@ -1,7 +1,6 @@
 module.exports = (env) ->
   fs = require 'fs'
 
-  convict = env.require "convict"
   Q = env.require 'q'
   assert = env.require 'cassert'
   __ = env.require('i18n').__
