@@ -1,7 +1,7 @@
 module.exports = (env) ->
   fs = require 'fs'
 
-  Q = env.require 'q'
+  Promise = env.require 'bluebird'
   assert = env.require 'cassert'
   __ = env.require('i18n').__
   semver = env.require 'semver'

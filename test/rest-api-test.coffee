@@ -3,7 +3,7 @@ module.exports = (env) ->
   assert = env.require "cassert"
   express = env.require 'express'
   request = env.require 'supertest'
-  Q = env.require 'q'
+  Promise = env.require 'bluebird'
 
   describe "pimatic-rest-api", ->
 
@@ -35,7 +35,7 @@ module.exports = (env) ->
     #         return true
     #       testAction: () -> 
     #         testActionCalled = true
-    #         return Q.fcall -> true
+    #         return Promise.resolve true
 
     #     getActuatorByIdCalled = false
     #     frameworkDummy.getDeviceById = (id) ->
@@ -87,7 +87,7 @@ module.exports = (env) ->
     #       assert id is 'test-id'
     #       assert ruleString is 'if 1 then 2'
     #       updateRuleByStringCalled = true
-    #       return Q.fcall -> true
+    #       return Promise.resolve true
 
     #     request(app)
     #       .post('/api/rule/test-id/update')
@@ -107,7 +107,7 @@ module.exports = (env) ->
     #       assert id is 'test-id'
     #       assert ruleString is 'if 1 then 2'
     #       updateRuleByStringCalled = true
-    #       return Q.fcall -> throw new Error('a expected error')
+    #       return Promise.try -> throw new Error('a expected error')
 
     #     request(app)
     #       .post('/api/rule/test-id/update')
@@ -129,7 +129,7 @@ module.exports = (env) ->
     #       assert id is 'test-id'
     #       assert ruleString is 'if 1 then 2'
     #       addRuleByStringCalled = true
-    #       return Q.fcall -> true
+    #       return Promise.resolve true
 
     #     request(app)
     #       .post('/api/rule/test-id')
@@ -149,7 +149,7 @@ module.exports = (env) ->
     #       assert id is 'test-id'
     #       assert ruleString is 'if 1 then 2'
     #       addRuleByStringCalled = true
-    #       return Q.fcall -> throw new Error('a expected error')
+    #       return Promise.try -> throw new Error('a expected error')
 
     #     request(app)
     #       .post('/api/rule/test-id')
