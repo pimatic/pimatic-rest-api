@@ -1,45 +1,11 @@
 module.exports = (env) ->
-  fs = require 'fs'
-
-  Promise = env.require 'bluebird'
-  assert = env.require 'cassert'
-  __ = env.require('i18n').__
-  semver = env.require 'semver'
-  _ = env.require 'lodash'
-  M = env.matcher
-  api = env.require 'decl-api'
 
   class RestApi extends env.plugins.Plugin
-    config: null
 
     init: (app, framework, @config) =>
-
-      onError = (error) =>
-        if error instanceof Error
-          message = error.message
-          env.logger.error error.message
-          env.logger.debug error.stack
-
-      app.get("/api/device/:deviceId/:actionName", (req, res, next) =>
-        deviceId = req.params.deviceId
-        actionName = req.params.actionName
-        device = framework.getDeviceById(deviceId)
-        if device?
-          if device.hasAction(actionName)
-            action = device.actions[actionName]
-            api.callActionFromReqAndRespond(actionName, action, device, req, res)
-          else
-            api.sendErrorResponse(res, 'device hasn\'t that action')
-        else api.sendErrorResponse(res, 'device not found')
-      )
-
-      app.get("/api", (req, res, nest) => res.send(api.stringifyApi(env.api.all)) )
-      app.get("/api/decl-api-client.js", api.serveClient)
-
-      api.createExpressRestApi(app, env.api.framework.actions, framework, onError)
-      api.createExpressRestApi(app, env.api.rules.actions, framework.ruleManager, onError)
-      api.createExpressRestApi(app, env.api.variables.actions, framework.variableManager, onError)
-      api.createExpressRestApi(app, env.api.plugins.actions, framework.pluginManager, onError)
-      api.createExpressRestApi(app, env.api.database.actions, framework.database, onError)
+      env.logger.warn """
+        The pimatic-rest-api plugin is deprecated, because pimatic >= 0.8.0 has build in support
+        for rest calls and a new external api. Please remove the plugin from your config.
+      """
 
   return new RestApi
