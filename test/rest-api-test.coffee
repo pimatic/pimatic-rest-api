@@ -233,7 +233,7 @@ module.exports = (env) ->
 
     #   it 'should return the devices list', (finish) ->
 
-    #     frameworkDummy.devices = [
+    #     frameworkDummy.deviceManager.devices = [
     #       {
     #         id: 'id1'
     #         name: 'name1'
